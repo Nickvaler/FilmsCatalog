@@ -1,0 +1,54 @@
+﻿@using FilmsCatalog.ViewModel
+@model InfoVIewModel
+@{
+    ViewData["Title"] = Model.Movie.Name;
+}
+<div class="text-center">
+    @if (Model is null)
+    {
+        <h1 class="display-4">Не найдено информации по фильму.</h1>
+    }
+    else
+    {
+<div class="text-center">
+    <h1 class="display-4">@Model.Movie.Name</h1>
+    <hr />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                @if (Model.Movie.Poster != null)
+                {
+                    <img class="infoImg img-fluid" alt="Не найдено" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Movie.Poster))" />
+                }
+                else
+                {
+                    <img alt="Не найдено" src="" />
+                }
+                @if (Model.CanEdit)
+                {
+                    <div class="mt-2">
+                        <a class="btn btn-secondary btn-lg active" asp-action="Edit" ajaxy asp-route-id="@Model.Movie.Id">Редактировать</a>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-8">
+                <h3 class="text-left">
+                    <label asp-for="Movie.Description"></label>
+                </h3>
+                <p class="text-left">@Model.Movie.Description</p>
+                <h5 class="text-left">
+                    <label asp-for="Movie.YearOfIssue"></label>
+                </h5>
+                <p class="text-left">@Model.Movie.YearOfIssue</p>
+                <h5 class="text-left">
+                    <label asp-for="Movie.Director"></label>
+                </h5>
+                <p class="text-left">@Model.Movie.Director</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+    }
+</div>
