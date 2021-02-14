@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace FilmsCatalog.Views.Home
+namespace FilmsCatalog.Views.Movie
 {
-    public class EditModel : PageModel
+    public class NotFoundModel : PageModel
     {
         public void OnGet()
         {

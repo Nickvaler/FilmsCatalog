@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FilmsCatalog.Migrations
 {
-    public partial class Initialization : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -47,6 +47,20 @@ namespace FilmsCatalog.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Posters",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posters", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,7 +180,7 @@ namespace FilmsCatalog.Migrations
                     YearOfIssue = table.Column<int>(type: "int", nullable: false),
                     Director = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Poster = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                    PosterId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -177,6 +191,12 @@ namespace FilmsCatalog.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Movies_Posters_PosterId",
+                        column: x => x.PosterId,
+                        principalTable: "Posters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -219,6 +239,11 @@ namespace FilmsCatalog.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Movies_PosterId",
+                table: "Movies",
+                column: "PosterId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Movies_UserId",
                 table: "Movies",
                 column: "UserId");
@@ -249,6 +274,9 @@ namespace FilmsCatalog.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Posters");
         }
     }
 }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmsCatalog.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210213190807_Initialization")]
-    partial class Initialization
+    [Migration("20210214173520_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,26 @@ namespace FilmsCatalog.Migrations
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.2");
+
+            modelBuilder.Entity("FilmsCatalog.Database.Poster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Posters");
+                });
 
             modelBuilder.Entity("FilmsCatalog.Models.Movie", b =>
                 {
@@ -43,8 +63,8 @@ namespace FilmsCatalog.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<byte[]>("Poster")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<int>("PosterId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -53,6 +73,8 @@ namespace FilmsCatalog.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PosterId");
 
                     b.HasIndex("UserId");
 
@@ -266,9 +288,17 @@ namespace FilmsCatalog.Migrations
 
             modelBuilder.Entity("FilmsCatalog.Models.Movie", b =>
                 {
+                    b.HasOne("FilmsCatalog.Database.Poster", "Poster")
+                        .WithMany()
+                        .HasForeignKey("PosterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FilmsCatalog.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Poster");
 
                     b.Navigation("User");
                 });

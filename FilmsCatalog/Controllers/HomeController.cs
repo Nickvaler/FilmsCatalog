@@ -1,16 +1,16 @@
 ﻿using FilmsCatalog.Data;
 using FilmsCatalog.Models;
 using FilmsCatalog.ViewModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Server;
+using Microsoft.AspNetCore.Hosting;
 
 namespace FilmsCatalog.Controllers
 {
@@ -19,20 +19,27 @@ namespace FilmsCatalog.Controllers
         private ApplicationDbContext _db;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<HomeController> _logger;
+        private IWebHostEnvironment _appEnvironment;
 
-        public HomeController(ILogger<HomeController> logger, 
-            ApplicationDbContext context,
-            UserManager<User> userManager)
+        public HomeController(ILogger<HomeController> logger,
+                              ApplicationDbContext context,
+                              IWebHostEnvironment webHostEnvironment,
+                              UserManager<User> userManager)
         {
             _logger = logger;
             _db = context;
             _userManager = userManager;
+            _appEnvironment = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 8;
-            var movies = await _db.Movies.Skip((page-1)*pageSize).Take(pageSize).ToListAsync();
+            var movies = await _db.Movies.Include(x=>x.Poster).Skip((page-1)*pageSize).Take(pageSize).ToListAsync();
+            foreach (var movie in movies)
+            {
+                movie.Poster.Path = CheckPoster(movie);
+            }
             var moviesCount = await _db.Movies.CountAsync();
             IndexViewModel model = new IndexViewModel();
             model.Movies = movies;
@@ -40,96 +47,33 @@ namespace FilmsCatalog.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult Add()
+        private string CheckPoster(Movie movie)
         {
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> Add(AddViewModel model)
-        {
-            if (ModelState.IsValid)
+            if (System.IO.File.Exists(_appEnvironment.WebRootPath + movie.Poster.Path))
             {
-                var user = await _userManager.GetUserAsync(User);
-                byte[] imageData = null;
-                if (model.Poster != null)
-                {
-                    using (var binaryReader = new BinaryReader(model.Poster.OpenReadStream()))
-                    {
-                        imageData = binaryReader.ReadBytes((int)model.Poster.Length);
-                    }
-                }
-                _db.Movies.Add(new Movie()
-                {
-                    Name = model.Name,
-                    Description = model.Description,
-                    YearOfIssue = model.YearOfIssue,
-                    Director = model.Director,
-                    User = user,
-                    Poster = imageData
-                });
-                await _db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return movie.Poster.Path;
             }
             else
             {
-                return View(model);
+                return "/Files/NotFound.jpeg";
             }
-            
         }
 
         public async Task<IActionResult> Info(int id)
         {
-            var movie = _db.Movies.Where(x => x.Id == id).FirstOrDefault();
+            var movie = _db.Movies.Include(x => x.Poster).Where(x => x.Id == id).FirstOrDefault();
             InfoVIewModel info = new InfoVIewModel();
             info.Movie = movie;
             var user = await _userManager.GetUserAsync(User);
 
-            if (movie != null && user.Id == movie.UserId)
+            if (movie != null && user?.Id == movie.UserId)
             {
+                movie.Poster.Path = CheckPoster(movie);
                 info.CanEdit = true;
             }
             return View(info);
         }
 
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            var movie = _db.Movies.Where(x => x.Id == id).FirstOrDefault();
-            return View(movie);
-        }
-        [HttpPost]
-        public async Task<IActionResult> Edit(AddViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                byte[] imageData = null;
-                if (model.Poster != null)
-                {
-                    using (var binaryReader = new BinaryReader(model.Poster.OpenReadStream()))
-                    {
-                        imageData = binaryReader.ReadBytes((int)model.Poster.Length);
-                    }
-                }
-                var movie = _db.Movies.Find(model.Id);
-                movie.Name = model.Name;
-                movie.Description = model.Description;
-                movie.YearOfIssue = model.YearOfIssue;
-                movie.Director = model.Director;
-                movie.User = user;
-                movie.Poster = imageData ?? movie.Poster;
-
-                _db.Movies.Update(movie);
-                await _db.SaveChangesAsync();
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                return View(model);
-            }
-
-        }
         public IActionResult Privacy()
         {
             return View();

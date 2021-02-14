@@ -18,16 +18,22 @@
             <div class="col-sm-3">
                 @if (Model.Movie.Poster != null)
                 {
-                    <img class="infoImg img-fluid" alt="Не найдено" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Movie.Poster))" />
+                    <img class="infoImg img-fluid" alt="Не найдено" src="@Url.Content(Model.Movie.Poster.Path)" />
                 }
                 else
                 {
-                    <img alt="Не найдено" src="" />
+                    <img class="img-fluid" alt="Не найдено" src="@Url.Content("/Files/NotFound.jpeg")" />
                 }
                 @if (Model.CanEdit)
                 {
                     <div class="mt-2">
-                        <a class="btn btn-secondary btn-lg active" asp-action="Edit" ajaxy asp-route-id="@Model.Movie.Id">Редактировать</a>
+                        <a class="btn btn-secondary btn-lg active"
+                           asp-controller="Movie"
+                           asp-action="AddEdit" ajaxy
+                           asp-route-val="1"
+                           asp-route-id="@Model.Movie.Id">
+                            Редактировать
+                        </a>
                     </div>
                 }
             </div>

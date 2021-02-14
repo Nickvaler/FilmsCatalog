@@ -1,0 +1,88 @@
+﻿@using FilmsCatalog.ViewModel
+@model AddEditViewModel
+@{
+    if (Model.IsEdit)
+    {
+        ViewData["Title"] = "Изменение фильма";
+    }
+    else
+    {
+        ViewData["Title"] = "Добавление фильма";
+    }
+}
+
+<div class="container h-100">
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-10 col-md-8 col-lg-">
+            @if (Model.IsEdit)
+            {
+            <p class="h3 text-info f font-weight-bold mb-lg-4">Изменение фильма</p>
+            }
+            else
+            {
+                <p class="h3 text-info font-weight-bold mb-lg-4">Добавление фильма</p>
+            }
+            <hr />
+
+            <form class="form-example" asp-action="AddEdit" asp-controller="Movie" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" value="@Model?.Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea type="text" asp-for="Description" value="@Model?.Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="YearOfIssue" class="control-label"></label>
+                    <input asp-for="YearOfIssue" value="@Model?.YearOfIssue" class="form-control" />
+                    <span asp-validation-for="YearOfIssue" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Director" class="control-label"></label>
+                    <input asp-for="Director" value="@Model?.Director" class="form-control" />
+                    <span asp-validation-for="Director" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Poster" class="control-label"></label>
+                    <div>
+                        @if (Model.IsEdit)
+                        {
+                            @if (Model?.PosterArr != null)
+                            {
+                                <img class="infoImg img-fluid mb-2" alt="Не найдено" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model?.PosterArr))" />
+                            }
+                            else
+                            {
+                                <img alt="Не найдено" src="" />
+                            }
+                            <input type="file" asp-for="Poster" value="@Model?.Poster" class="form-control-file" />
+                            <span asp-validation-for="Poster" class="text-danger"></span>
+                        }
+                        else
+                        {
+                            <input type="file" asp-for="Poster" value="@Model?.Poster" class="form-control-file" />
+                            <span asp-validation-for="Poster" class="text-danger"></span>
+                        }
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    @if (Model.IsEdit)
+                    {
+                        <input class="d-none" asp-for="IsEdit" value="@Model.IsEdit" />
+                        <input type="submit" value="Сохранить" class="btn btn-primary" />
+                    }
+                    else
+                    {
+                        <input class="d-none" asp-for="IsEdit" value="@Model.IsEdit" />
+                        <input type="submit" value="Добавить" class="btn btn-primary" />
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

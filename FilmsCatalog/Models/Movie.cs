@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FilmsCatalog.Database;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FilmsCatalog.Models
@@ -25,7 +26,9 @@ namespace FilmsCatalog.Models
         [ForeignKey("UserId")]
         public User User { get; set; }
 
-        [Display(Name = "Постер")]
-        public byte[] Poster { get; set; }
+        public int PosterId { get; set; }
+
+        [ForeignKey("PosterId")]
+        public Poster Poster { get; set; }
     }
 }

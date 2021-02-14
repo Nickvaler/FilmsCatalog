@@ -7,7 +7,7 @@
 <div class="text-center">
     <h1 class="display-4">Список фильмов</h1>
     <hr />
-    @if (Model.Movies.Count() > 0)
+    @if (Model?.Movies.Count() > 0)
     {
         <div class="container">
             <div class="row">
@@ -18,16 +18,16 @@
                         <a href="@Url.Action("Info", new { id = movie.Id })">
                             @if (movie.Poster != null)
                             {
-                                <img class="img-fluid" alt="Не найдено" src="data:image/jpeg;base64,@(Convert.ToBase64String(movie.Poster))" />
+                                <img class="img-fluid" alt="Не найдено" src="@Url.Content(movie.Poster.Path)" />
                             }
                             else
                             {
-                                <img style='width:80px; height:60px;' alt="Не найдено" src="" />
+                                <img class="img-fluid" alt="Не найдено" src="@Url.Content("/Files/NotFound.jpeg")" />
                             }
                         </a>
 
                         <div class="btn-link">
-                            <h4 class="btn-link">@Html.ActionLink(movie.Name, "Info", new { id = movie.Id })</h4>
+                            <h4 class="btn-link  text-break">@Html.ActionLink(movie.Name, "Info", new { id = movie.Id })</h4>
                         </div>
                         <p>@movie.YearOfIssue</p>
                     </div>
@@ -54,7 +54,7 @@
                 </a>
             }
         </div>
-       
+
         @if (Model.PageViewModel.HasPreviousPage)
         {
             <a asp-action="Index"
